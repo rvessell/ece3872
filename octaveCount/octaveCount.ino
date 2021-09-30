@@ -1,69 +1,58 @@
 #include <math.h>
 #include <stdio.h>
 #define speakerPIN 5
-#define BUTTON_PIN 2
+#define OCTAVE_BUTTON 2
+#define START_BUTTON 3
+#define MODE_BUTTON 4
 #define songLength 54
 
 int octave = 4;
-float C = 16.3516*pow(2,octave);
-float D = 18.35405*pow(2,octave);
-float E = 20.60172*pow(2,octave);
-float F = 21.82676*pow(2,octave);
-float G = 24.49971*pow(2,octave);
-float A = 27.5*pow(2,octave);
-float B = 30.86771*pow(2,octave);
-float high_C = 32.70320*pow(2,octave);
+float C = 16.3516;
+float D = 18.35405;
+float E = 20.60172;
+float F = 21.82676;
+float G = 24.49971;
+float A = 27.5;
+float B = 30.86771;
+float high_C = 32.70320;
 float rest = 0;
+unsigned long last_interrupt = 0;
+bool doPlayback = false;
+bool testMode = false;
+bool prevMode = HIGH;
+bool currMode = false;
 
 float notes[] = {C, rest, C, rest, C, rest, D, rest, E, rest, E, rest, D, rest, E, rest, F, rest, G, rest, high_C, rest, high_C, rest, high_C, rest, G, rest, G, rest, G, rest, E, rest, E, rest, E, rest, C, rest, C, rest, C, rest, G, rest, F, rest, E, rest, D, rest, C, rest};
 int beats[] = {2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,2,1,1,1,5,1};
 int gap = 100;
 
-
-
-int lastButtonState;    
-int currentButtonState = LOW;
-
-void changeFrequency(int octave){
-  
-  notes[0,2,4,38,40,42,53] = 16.3516*pow(2,octave);
-  D = 18.35405*pow(2,octave);
-  E = 20.60172*pow(2,octave);
-  F = 21.82676*pow(2,octave);
-  G = 24.49971*pow(2,octave);
-  A = 27.5*pow(2,octave);
-  B = 30.86771*pow(2,octave);
-  high_C = 32.70320*pow(2,octave);
-  rest = 0;
-  Serial.print("octave is ");
-  Serial.println(octave);
-  Serial.println(C);
-  Serial.println(G);
-  Serial.println(high_C);
-  return notes;
+//interrupt driven change of the octave. On a downpress the octave will increment up to 7 then go back to 4 on the next interrupt.
+void changeOctave(){
+  unsigned long interrupt = millis();
+  if(interrupt - last_interrupt > 1000){
+    if(octave == 7){
+      octave = 4;
+    }else{
+      octave++;
+    }
+    Serial.println(octave);
+  }
 }
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(BUTTON_PIN,INPUT);
-  currentButtonState = digitalRead(BUTTON_PIN);
-
+//interrupt driven change of playback state
+void startStop(){
+  unsigned long interrupt = millis();
+  if(interrupt - last_interrupt > 1000){
+    doPlayback = !doPlayback;
+    Serial.println(doPlayback);
+  }
 }
 
+//main playback method: TODO: make this method take in milliseconds
 void playSong(){
   int i_note_index = 0; 
-  while(i_note_index < songLength){
-      lastButtonState = currentButtonState;
-      currentButtonState = digitalRead(BUTTON_PIN);  
-      if(lastButtonState == HIGH && currentButtonState == LOW) {
-          octave++;
-      if(octave == 7){
-          octave = 1;
-      }
-      changeFrequency(octave);
-  }
-      tone(speakerPIN, notes[i_note_index], gap*beats[i_note_index]);
+  while(i_note_index < songLength && doPlayback){
+      tone(speakerPIN, notes[i_note_index]*pow(2,octave), gap*beats[i_note_index]);
       delay(gap*beats[i_note_index]);
       i_note_index++;
   }
@@ -72,6 +61,32 @@ void playSong(){
   } 
 }
 
+//Setup serial and pins
+void setup() {
+  Serial.begin(115200);
+  pinMode(OCTAVE_BUTTON, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(OCTAVE_BUTTON), changeOctave, FALLING);
+  pinMode(START_BUTTON, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(START_BUTTON), startStop, FALLING);
+  pinMode(MODE_BUTTON, INPUT_PULLUP);
+}
+
 void loop() {
-  playSong();
+  //This block reads the current button state and if it constitutes a state change, we update the testMode variable
+  currMode = digitalRead(MODE_BUTTON);
+  if(currMode == LOW && prevMode != LOW){
+    prevMode = LOW;
+    testMode = !testMode;
+    delay(200);
+  }else if(currMode == HIGH){
+    prevMode = HIGH;
+    delay(200);
+  }
+  //if doPlayback is true and we're in either of the two modes, do their respective tasks
+  if(!testMode && doPlayback){
+    playSong();
+  }else if(testMode && doPlayback){
+    Serial.println("Test Listen Mode!");
+    delay(1000);
+  }
 }
