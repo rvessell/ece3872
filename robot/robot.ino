@@ -49,19 +49,6 @@ void startStop(){
   }
 }
 
-//main playback method: TODO: make this method take in milliseconds
-void playSong(){
-  int i_note_index = 0; 
-  while(i_note_index < songLength && doPlayback){
-      tone(speakerPIN, notes[i_note_index]*pow(2,octave), gap*beats[i_note_index]);
-      delay(gap*beats[i_note_index]);
-      i_note_index++;
-  }
-  if(i_note_index >= songLength) {
-    i_note_index = 0;
-  } 
-}
-
 //Setup serial and pins
 void setup() {
   Serial.begin(115200);
