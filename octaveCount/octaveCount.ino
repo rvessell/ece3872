@@ -29,7 +29,7 @@ int gap = 100;
 //interrupt driven change of the octave. On a downpress the octave will increment up to 7 then go back to 4 on the next interrupt.
 void changeOctave(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt > 1000){
+  if(interrupt - last_interrupt > 200){
     if(octave == 7){
       octave = 4;
     }else{
@@ -37,15 +37,17 @@ void changeOctave(){
     }
     Serial.println(octave);
   }
+  last_interrupt = millis();
 }
 
 //interrupt driven change of playback state
 void startStop(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt > 1000){
+  if(interrupt - last_interrupt > 200){
     doPlayback = !doPlayback;
     Serial.println(doPlayback);
   }
+  last_interrupt = millis();
 }
 
 //main playback method: TODO: make this method take in milliseconds
@@ -77,11 +79,10 @@ void loop() {
   if(currMode == LOW && prevMode != LOW){
     prevMode = LOW;
     testMode = !testMode;
-    delay(200);
   }else if(currMode == HIGH){
     prevMode = HIGH;
-    delay(200);
   }
+  delay(200);
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     playSong();
