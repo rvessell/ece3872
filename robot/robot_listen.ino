@@ -9,10 +9,9 @@ void listen(){
   double peakVal;
   
   while(1) {
-  
     peakVal = analogRead(0);
     Serial.println(peakVal);
-    if (peakVal > 716 && !attack) {
+    if (peakVal > 490 && !attack) {
       if (attackCount < 20) {
         attackCount++;
       } else {
@@ -23,7 +22,7 @@ void listen(){
         attack = true;
         attackCount = 0;
       }
-    } else if (peakVal <= 716) {
+    } else if (peakVal <= 490) {
       if (releaseCount < 20) {
         releaseCount++;
       } else {
@@ -33,6 +32,7 @@ void listen(){
     }
     // once we get enough samples, we measure for the shortest duration
     if (count == 19) {
+      Serial.println("reached 20 samples");
       unsigned long minMils = 100000;
       for (int i = 0; i < 19; ++i) {
         if (peakMils[i + 1] - peakMils[i] < minMils) {
@@ -41,10 +41,11 @@ void listen(){
       }
       //bpm calculation from milliseconds
       double bpm = 60/(double)minMils * 1000 / 3;
+      Serial.println(bpm);
       //enter our playback loop
       doListen = false;
-      playSong();
-      
+      count = 0;
+      playSong(minMils);
     }
   }
 }

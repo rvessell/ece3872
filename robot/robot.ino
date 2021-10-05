@@ -7,25 +7,12 @@
 #define songLength 54
 
 int octave = 4;
-float C = 16.3516;
-float D = 18.35405;
-float E = 20.60172;
-float F = 21.82676;
-float G = 24.49971;
-float A = 27.5;
-float B = 30.86771;
-float high_C = 32.70320;
-float rest = 0;
 unsigned long last_interrupt = 0;
 bool doPlayback = false;
 bool doListen = false;
 bool testMode = false;
 bool prevMode = HIGH;
 bool currMode = false;
-
-float notes[] = {C, rest, C, rest, C, rest, D, rest, E, rest, E, rest, D, rest, E, rest, F, rest, G, rest, high_C, rest, high_C, rest, high_C, rest, G, rest, G, rest, G, rest, E, rest, E, rest, E, rest, C, rest, C, rest, C, rest, G, rest, F, rest, E, rest, D, rest, C, rest};
-int beats[] = {2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,2,1,1,1,5,1};
-int gap = 100;
 
 //interrupt driven change of the octave. On a downpress the octave will increment up to 7 then go back to 4 on the next interrupt.
 void changeOctave(){
@@ -73,7 +60,7 @@ void loop() {
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     listen();
-    //playSong();
+    //playSong(100);
     
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
