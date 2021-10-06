@@ -5,6 +5,8 @@
 #define START_BUTTON 3
 #define MODE_BUTTON 4
 #define songLength 54
+#define ledSTARTPIN 13
+#define ledOCTAVEPIN 12
 
 int octave = 4;
 float C = 16.3516;
@@ -22,6 +24,7 @@ bool doPlayback = false;
 bool testMode = false;
 bool prevMode = HIGH;
 bool currMode = false;
+bool octaveLED = false;
 
 float notes[] = {C, rest, C, rest, C, rest, D, rest, E, rest, E, rest, D, rest, E, rest, F, rest, G, rest, high_C, rest, high_C, rest, high_C, rest, G, rest, G, rest, G, rest, E, rest, E, rest, E, rest, C, rest, C, rest, C, rest, G, rest, F, rest, E, rest, D, rest, C, rest};
 int beats[] = {2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,2,1,1,1,5,1};
@@ -30,13 +33,15 @@ int gap = 100;
 //interrupt driven change of the octave. On a downpress the octave will increment up to 7 then go back to 4 on the next interrupt.
 void changeOctave(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt_octave > 200){
+  if(interrupt - last_interrupt_octave > 500){
     if(octave == 7){
       octave = 4;
     }else{
       octave++;
     }
-    Serial.println(octave);
+    octaveLED = !octaveLED;
+    Serial.println(octave);    
+    digitalWrite(ledOCTAVEPIN,octaveLED); 
   }
   last_interrupt_octave = millis();
 }
@@ -44,8 +49,9 @@ void changeOctave(){
 //interrupt driven change of playback state
 void startStop(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt_startStop > 200){
+  if(interrupt - last_interrupt_startStop > 500){
     doPlayback = !doPlayback;
+    digitalWrite(ledSTARTPIN, doPlayback); 
     Serial.println(doPlayback);
   }
   last_interrupt_startStop = millis();
@@ -72,6 +78,8 @@ void setup() {
   pinMode(START_BUTTON, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(START_BUTTON), startStop, FALLING);
   pinMode(MODE_BUTTON, INPUT_PULLUP);
+  pinMode(ledSTARTPIN, OUTPUT);
+  pinMode(ledOCTAVEPIN, OUTPUT);
 }
 
 void loop() {
@@ -84,6 +92,7 @@ void loop() {
     prevMode = HIGH;
   }
   delay(200);
+
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     playSong();
