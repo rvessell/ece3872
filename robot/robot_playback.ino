@@ -18,12 +18,13 @@ int beats[] = {2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 void playSong(unsigned long gap){
   int i_note_index = 0; 
   while(i_note_index < songLength && doPlayback){
-      tone(speakerPIN, notes[i_note_index]*pow(2,octave), gap*beats[i_note_index]);
-      delay(gap*beats[i_note_index]);
+    Serial.println("Playing...");
+      tone(speakerPIN, notes[i_note_index]*pow(2,octave), (gap/2)*beats[i_note_index]);
+      delay((gap/2)*beats[i_note_index]);
       i_note_index++;
       moveMotors();
+    if(i_note_index >= songLength) {
+      i_note_index = 0;
+    }
   }
-  if(i_note_index >= songLength) {
-    i_note_index = 0;
-  } 
 }

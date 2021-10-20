@@ -32,7 +32,6 @@ void startStop(){
   unsigned long interrupt = millis();
   if(interrupt - last_interrupt > 1000){
     doPlayback = !doPlayback;
-    Serial.println(doPlayback);
   }
 }
 
@@ -44,9 +43,11 @@ void setup() {
   pinMode(START_BUTTON, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(START_BUTTON), startStop, FALLING);
   pinMode(MODE_BUTTON, INPUT_PULLUP);
+  Serial.println("Waiting in idle mode");
 }
 
 void loop() {
+  //
   //This block reads the current button state and if it constitutes a state change, we update the testMode variable
   currMode = digitalRead(MODE_BUTTON);
   if(currMode == LOW && prevMode != LOW){
@@ -59,9 +60,8 @@ void loop() {
   }
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
+    Serial.println("Listening...");
     listen();
-    //playSong(100);
-    
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
     delay(1000);

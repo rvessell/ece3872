@@ -1,18 +1,22 @@
+#define samples 6
+int thresh = 490;
+
 void listen(){
   
   int count = 0;
-  int16_t* peakVals = new int16_t[20];
-  unsigned long* peakMils = new unsigned long[20];
+  int16_t* peakVals = new int16_t[samples];
+  unsigned long* peakMils = new unsigned long[samples];
   bool attack = false;
   int releaseCount = 0;
   int attackCount = 0;
   double peakVal;
+ 
   
-  while(1) {
+  while(doPlayback) {
     peakVal = analogRead(0);
-    Serial.println(peakVal);
-    if (peakVal > 490 && !attack) {
-      if (attackCount < 20) {
+    //Serial.println(peakVal);
+    if (peakVal > thresh && !attack) {
+      if (attackCount < 5) {
         attackCount++;
       } else {
         peakVals[count] = peakVal;
@@ -22,8 +26,8 @@ void listen(){
         attack = true;
         attackCount = 0;
       }
-    } else if (peakVal <= 490) {
-      if (releaseCount < 20) {
+    } else if (peakVal <= thresh) {
+      if (releaseCount < 5) {
         releaseCount++;
       } else {
         attack = false;
@@ -31,18 +35,26 @@ void listen(){
       }
     }
     // once we get enough samples, we measure for the shortest duration
-    if (count == 19) {
-      Serial.println("reached 20 samples");
-      unsigned long minMils = 100000;
-      for (int i = 0; i < 19; ++i) {
+    unsigned long minMils;
+    if (count == samples - 1) {
+      Serial.println("reached 6 samples");
+      minMils = 100000;
+      for (int i = 0; i < samples; ++i) {
         if (peakMils[i + 1] - peakMils[i] < minMils) {
           minMils = peakMils[i + 1] - peakMils[i];
         }
       }
       //bpm calculation from milliseconds
       double bpm = 60/(double)minMils * 1000 / 3;
-      Serial.println(bpm);
+      Serial.print("BPM: ");
+      Serial.print(bpm);
+      
+    }else if(count == samples){
       //enter our playback loop
+      //adjust minMils by the amount of delay we have for motors, roughly 30ms
+      minMils -= 30;
+      Serial.println("Waiting to join in");
+      delay(minMils*9);
       doListen = false;
       count = 0;
       playSong(minMils);
@@ -64,7 +76,7 @@ void testListen()
   
     peakVal = analogRead(0);
     Serial.println(peakVal);
-    if (peakVal > 716 && !attack) {
+    if (peakVal > thresh && !attack) {
       if (attackCount < 20) {
         attackCount++;
       } else {
@@ -75,7 +87,7 @@ void testListen()
         attack = true;
         attackCount = 0;
       }
-    } else if (peakVal <= 716) {
+    } else if (peakVal <= thresh) {
       if (releaseCount < 20) {
         releaseCount++;
       } else {

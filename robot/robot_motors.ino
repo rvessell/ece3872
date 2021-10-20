@@ -20,20 +20,20 @@ void moveMotors(){
     setupMotor();
     motorSetup = true;
   }
-
-  //spin left from 0 to 180
+  Serial.println("Moving motor...");
+  //need a 2ms delay
   if(pos == 0){
-    for(pos = 0; pos <= 180; pos+=5){
+    for(pos = 0; pos <= 90; pos+=5){
       servo1.write(pos);
       servo2.write(pos);
-      Serial.println(pos);
+      delay(2);
     }
-    pos = 180;
+    pos = 90;
   }else{
-    for(pos = 180; pos >= 0; pos-=5){
+    for(pos = 90; pos >= 0; pos-=5){
       servo1.write(pos);
       servo2.write(pos);
-      Serial.println(pos);
+      delay(2);
     }
     pos = 0;
   }
