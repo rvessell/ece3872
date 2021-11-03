@@ -1,9 +1,9 @@
 #include <math.h>
 #include <stdio.h>
 #define speakerPIN 5
-#define OCTAVE_BUTTON 2
-#define START_BUTTON 3
-#define MODE_BUTTON 4
+#define OCTAVE_BUTTON 1
+#define START_BUTTON 2
+#define MODE_BUTTON 0
 #define songLength 54
 
 int octave = 4;
@@ -61,7 +61,8 @@ void loop() {
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     Serial.println("Listening...");
-    listen();
+    //listen();
+    playSong(100);
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
     delay(1000);

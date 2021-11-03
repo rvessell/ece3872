@@ -21,8 +21,10 @@ void playSong(unsigned long gap){
     Serial.println("Playing...");
       tone(speakerPIN, notes[i_note_index]*pow(2,octave), (gap/2)*beats[i_note_index]);
       delay((gap/2)*beats[i_note_index]);
+      if((i_note_index % 2) == 0){
+        moveMotors();
+      }
       i_note_index++;
-      moveMotors();
     if(i_note_index >= songLength) {
       i_note_index = 0;
     }
