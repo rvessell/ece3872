@@ -5,34 +5,45 @@
 #define START_BUTTON 2
 #define MODE_BUTTON 0
 #define songLength 54
+#define ledSTARTPIN 13
+#define ledOCTAVEPIN 12
+#define ledMODEPIN 9
 
 int octave = 4;
 unsigned long last_interrupt = 0;
 bool doPlayback = false;
 bool doListen = false;
 bool testMode = false;
-bool prevMode = HIGH;
+bool prevMode = HIGH; 
 bool currMode = false;
+bool octaveLED = false;
 
 //interrupt driven change of the octave. On a downpress the octave will increment up to 7 then go back to 4 on the next interrupt.
 void changeOctave(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt > 1000){
+  if(interrupt - last_interrupt > 500){
     if(octave == 7){
       octave = 4;
     }else{
       octave++;
     }
+    octaveLED = !octaveLED;  
+    digitalWrite(ledOCTAVEPIN,octaveLED);     
     Serial.println(octave);
   }
+  last_interrupt = interrupt;
 }
 
 //interrupt driven change of playback state
 void startStop(){
   unsigned long interrupt = millis();
-  if(interrupt - last_interrupt > 1000){
+  if(interrupt - last_interrupt > 500){
     doPlayback = !doPlayback;
+    Serial.println("doPlayback");
+    digitalWrite(ledSTARTPIN, doPlayback);
   }
+  last_interrupt = interrupt;
+  
 }
 
 //Setup serial and pins
@@ -44,6 +55,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(START_BUTTON), startStop, FALLING);
   pinMode(MODE_BUTTON, INPUT_PULLUP);
   Serial.println("Waiting in idle mode");
+  pinMode(ledSTARTPIN, OUTPUT);
+  pinMode(ledOCTAVEPIN, OUTPUT);
+  pinMode(ledMODEPIN, OUTPUT);
 }
 
 void loop() {
@@ -53,16 +67,21 @@ void loop() {
   if(currMode == LOW && prevMode != LOW){
     prevMode = LOW;
     testMode = !testMode;
-    delay(200);
+    digitalWrite(ledMODEPIN, testMode);
   }else if(currMode == HIGH){
     prevMode = HIGH;
-    delay(200);
   }
+  delay(200);
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     Serial.println("Listening...");
+<<<<<<< HEAD
     //listen();
     playSong(100);
+=======
+    listen();
+    playSong(150);
+>>>>>>> 28977e9150a356a781a171dc8100f892f046b2d1
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
     delay(1000);
