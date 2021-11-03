@@ -58,6 +58,8 @@ void setup() {
   pinMode(ledSTARTPIN, OUTPUT);
   pinMode(ledOCTAVEPIN, OUTPUT);
   pinMode(ledMODEPIN, OUTPUT);
+
+  setupBaseline();
 }
 
 void loop() {
@@ -75,13 +77,7 @@ void loop() {
   //if doPlayback is true and we're in either of the two modes, do their respective tasks
   if(!testMode && doPlayback){
     Serial.println("Listening...");
-<<<<<<< HEAD
-    //listen();
-    playSong(100);
-=======
     listen();
-    playSong(150);
->>>>>>> 28977e9150a356a781a171dc8100f892f046b2d1
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
     delay(1000);

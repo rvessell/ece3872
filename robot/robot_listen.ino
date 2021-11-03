@@ -1,5 +1,18 @@
 #define samples 6
 int thresh = 490;
+double base[10]
+
+void setupBaseline(){
+  double avg = 0;
+  for(int i = 0; i < 10; ++i){
+    base[i] = analogRead(0);
+  }
+
+  for(int i = 0; i < 10; ++i){
+    avg += base[i];
+  }
+  thresh = (avg/10) + 20;
+}
 
 void listen(){
   
