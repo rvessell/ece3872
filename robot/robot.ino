@@ -5,8 +5,8 @@
 #define START_BUTTON 2
 #define MODE_BUTTON 0
 #define songLength 54
-#define ledSTARTPIN 13
-#define ledOCTAVEPIN 12
+#define ledSTARTPIN 7
+#define ledOCTAVEPIN 8
 #define ledMODEPIN 9
 
 int octave = 4;
@@ -58,7 +58,6 @@ void setup() {
   pinMode(ledSTARTPIN, OUTPUT);
   pinMode(ledOCTAVEPIN, OUTPUT);
   pinMode(ledMODEPIN, OUTPUT);
-
   setupBaseline();
 }
 

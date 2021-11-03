@@ -1,6 +1,6 @@
 #define samples 6
 int thresh = 490;
-double base[10]
+double base[10];
 
 void setupBaseline(){
   double avg = 0;
