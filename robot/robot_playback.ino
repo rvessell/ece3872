@@ -18,7 +18,7 @@ int beats[] = {2,1,2,1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 void playSong(unsigned long gap){
   int i_note_index = 0; 
   while(i_note_index < songLength && doPlayback){
-    Serial.println("Playing...");
+    //Serial.println("Playing...");
       tone(speakerPIN, notes[i_note_index]*pow(2,octave), (gap/2)*beats[i_note_index]);
       delay((gap/2)*beats[i_note_index]);
       if((i_note_index % 2) == 0){

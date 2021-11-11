@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #define speakerPIN 5
-#define OCTAVE_BUTTON 1
+#define OCTAVE_BUTTON 3
 #define START_BUTTON 2
 #define MODE_BUTTON 0
 #define songLength 54
@@ -43,7 +43,10 @@ void startStop(){
     digitalWrite(ledSTARTPIN, doPlayback);
   }
   last_interrupt = interrupt;
-  
+
+  if(!doPlayback){
+    detachServos();
+  }
 }
 
 //Setup serial and pins
@@ -58,7 +61,6 @@ void setup() {
   pinMode(ledSTARTPIN, OUTPUT);
   pinMode(ledOCTAVEPIN, OUTPUT);
   pinMode(ledMODEPIN, OUTPUT);
-  setupBaseline();
 }
 
 void loop() {
@@ -77,6 +79,7 @@ void loop() {
   if(!testMode && doPlayback){
     Serial.println("Listening...");
     listen();
+    //playSong(100);
   }else if(testMode && doPlayback){
     Serial.println("Test Listen Mode!");
     delay(1000);
