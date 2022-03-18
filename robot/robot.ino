@@ -9,6 +9,8 @@
 #define ledOCTAVEPIN 12
 #define ledMODEPIN 9
 
+
+//testing
 int octave = 4;
 unsigned long last_interrupt = 0;
 bool doPlayback = false;
